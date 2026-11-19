@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#0B1E3D">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Teleprompter">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<title>Teleprompter</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ TELA 1: ROTEIROS ============ -->
+<section id="home" class="screen active">
+  <header class="topbar">
+    <h1>Teleprompter</h1>
+    <button id="btnNew" class="btn lime">+ Novo</button>
+  </header>
+  <div id="list" class="list"></div>
+  <p id="emptyMsg" class="empty" hidden>Nenhum roteiro ainda.<br>Toque em <b>+ Novo</b> para criar o primeiro.</p>
+</section>
+
+<!-- ============ TELA 2: EDITOR ============ -->
+<section id="editor" class="screen">
+  <header class="topbar">
+    <button id="btnBack" class="btn ghost">‹ Roteiros</button>
+    <button id="btnDelete" class="btn ghost danger">Excluir</button>
+  </header>
+  <div class="editor-body">
+    <input id="title" class="title-input" placeholder="Título do roteiro" maxlength="80">
+    <textarea id="body" placeholder="Cole ou digite o seu roteiro aqui…&#10;&#10;Dica: linhas entre [colchetes] viram marcações de cena e aparecem em destaque (ex.: [respire], [olhe para a câmera])."></textarea>
+    <div class="meta"><span id="wc">0 palavras</span><span id="dur">~0 min</span></div>
+  </div>
+  <footer class="bottombar">
+    <button id="btnSettings" class="btn ghost">⚙ Ajustes</button>
+    <button id="btnPlay" class="btn lime big">▶ Iniciar</button>
+  </footer>
+</section>
+
+<!-- ============ TELA 3: TELEPROMPTER ============ -->
+<section id="prompter" class="screen">
+  <video id="cam" playsinline muted autoplay></video>
+  <div id="shade"></div>
+
+  <div id="stage">
+    <div id="mirror">
+      <div id="text"></div>
+    </div>
+  </div>
+  <div id="guide"><i></i></div>
+  <div id="progress"><b></b></div>
+  <div id="countdown" hidden>3</div>
+
+  <div id="ptop" class="ptop">
+    <button id="pExit" class="chip">✕ Sair</button>
+    <span id="recTimer" class="rec" hidden>● 00:00</span>
+    <button id="pSettings" class="chip">⚙</button>
+  </div>
+
+  <div id="pbottom" class="pbottom">
+    <div class="row">
+      <button id="pRestart" class="chip" title="Voltar ao início">⟲</button>
+      <button id="pSlower" class="chip">−</button>
+      <button id="pPlay" class="chip play">▶</button>
+      <button id="pFaster" class="chip">+</button>
+      <button id="pRec" class="chip rec-btn" hidden title="Gravar">●</button>
+    </div>
+    <div class="row sl">
+      <label>Velocidade <output id="oSpeed"></output></label>
+      <input id="rSpeed" type="range" min="5" max="400" step="5">
+    </div>
+  </div>
+</section>
+
+<!-- ============ AJUSTES ============ -->
+<div id="sheet" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Ajustes</h2><button id="sheetClose" class="btn lime">Pronto</button></div>
+    <div class="sheet-body">
+      <label class="f">Velocidade <output data-o="speed"></output><input type="range" data-k="speed" min="5" max="400" step="5"></label>
+      <label class="f">Tamanho do texto <output data-o="size"></output><input type="range" data-k="size" min="20" max="140" step="2"></label>
+      <label class="f">Espaço entre linhas <output data-o="lh"></output><input type="range" data-k="lh" min="1" max="2.4" step="0.1"></label>
+      <label class="f">Margens laterais <output data-o="margin"></output><input type="range" data-k="margin" min="0" max="30" step="1"></label>
+      <label class="f">Início da leitura (altura) <output data-o="focus"></output><input type="range" data-k="focus" min="10" max="60" step="1"></label>
+      <label class="f">Contagem regressiva (s) <output data-o="count"></output><input type="range" data-k="count" min="0" max="10" step="1"></label>
+
+      <div class="f">Alinhamento
+        <div class="seg" data-k="align">
+          <button data-v="left">Esquerda</button><button data-v="center">Centro</button><button data-v="right">Direita</button>
+        </div>
+      </div>
+      <div class="f">Cor do texto
+        <div class="seg swatch" data-k="fg">
+          <button data-v="#FFFFFF" style="--c:#fff"></button><button data-v="#B5D96A" style="--c:#B5D96A"></button>
+          <button data-v="#FFE45C" style="--c:#FFE45C"></button><button data-v="#7CE0FF" style="--c:#7CE0FF"></button>
+          <button data-v="#111111" style="--c:#111"></button>
+        </div>
+      </div>
+      <div class="f">Cor de fundo
+        <div class="seg swatch" data-k="bg">
+          <button data-v="#000000" style="--c:#000"></button><button data-v="#0B1E3D" style="--c:#0B1E3D"></button>
+          <button data-v="#1A1A1A" style="--c:#1A1A1A"></button><button data-v="#FFFFFF" style="--c:#fff"></button>
+          <button data-v="#F5E9C8" style="--c:#F5E9C8"></button>
+        </div>
+      </div>
+
+      <label class="sw"><input type="checkbox" data-k="mirror"><span>Espelhar texto (para vidro/espelho do teleprompter)</span></label>
+      <label class="sw"><input type="checkbox" data-k="guide"><span>Mostrar linha-guia de leitura</span></label>
+      <label class="sw"><input type="checkbox" data-k="cue"><span>Destacar [marcações] de cena</span></label>
+      <label class="sw"><input type="checkbox" data-k="camera"><span>Usar câmera como fundo / gravar vídeo</span></label>
+      <label class="f" data-cam>Escurecer câmera <output data-o="shade"></output><input type="range" data-k="shade" min="0" max="90" step="5"></label>
+      <div class="f" data-cam>Câmera
+        <div class="seg" data-k="facing"><button data-v="user">Frontal</button><button data-v="environment">Traseira</button></div>
+      </div>
+      <p class="hint">Dica: no teleprompter, toque na tela para pausar/continuar e arraste para o lado de leitura para ajustar. Teclas: Espaço, ↑ ↓, Home.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ GRAVAÇÃO PRONTA ============ -->
+<div id="rec" class="sheet" hidden>
+  <div class="sheet-card">
+    <div class="sheet-head"><h2>Gravação pronta</h2><button id="recClose" class="btn ghost">Fechar</button></div>
+    <div class="sheet-body">
+      <video id="recVideo" controls playsinline></video>
+      <div class="row2">
+        <button id="recSave" class="btn lime big">Salvar vídeo</button>
+        <button id="recShare" class="btn ghost big">Compartilhar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
