@@ -162,7 +162,7 @@ function countdown(n){
 }
 function cancelCount(done){ clearInterval(cdT); counting = false; $('#countdown').hidden = true; if (!done) { $('#pPlay').textContent = '▶'; showCtl(); } }
 function showCtl(){ $('#prompter').classList.remove('hide'); clearTimeout(hideT); }
-function scheduleHide(){ clearTimeout(hideT); if (playing || counting) hideT = setTimeout(() => { if (!recording || true) $('#prompter').classList.add('hide'); }, 2500); }
+function scheduleHide(){ /* controles ficam sempre visíveis */ }
 function setSpeed(d){ S.speed = Math.max(5, Math.min(400, S.speed + d)); applySettings(); toast('Velocidade: ' + S.speed); }
 function restart(){ pause(); cancelCount(); pos = 0; paint(); }
 
